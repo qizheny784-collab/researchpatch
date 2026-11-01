@@ -1,0 +1,50 @@
+{
+  "policy_version": "v1.0",
+  "policy_file": "unlearning-privacy/design/metric-change-review-policy.md",
+  "check_date": "2026-11-01",
+  "checks": [
+    {
+      "id": "check-A-temperature-privacy",
+      "question": "温度变化后,该不该把攻击下降解释成隐私减少?",
+      "changed": "攻击 AUC 随温度变化:lossAUC 0.720(T=1)→0.689(T=5),confAUC 0.688→0.648",
+      "cause": "固定 M_orig 参数,只改输出温度 T=0.5/1/2/5(可逆重参数化)",
+      "data": "成员+非成员混合审计集(200成员+200非成员,共400样本)",
+      "reversible": "温度缩放 p_T=softmax(z/T) 是概率单纯形上的双射(可逆),给定 T 和完整 p_T 可还原 p_1=softmax(T*log(p_T)),信息量不变",
+      "supported": "攻击对输出变换敏感(描述性结论)",
+      "not_supported": "隐私信息减少 / 遗忘成功(因果/机制结论,不可由可逆变换的指标变化支撑)",
+      "must_change": "任何把'攻击 AUC 下降'解释为'隐私减少/遗忘成功'的句子",
+      "must_not_change": "描述'攻击对输出变换敏感'的句子;'温度缩放不改变 argmax 预测类别'的句子",
+      "verdict": "不应把攻击下降解释成隐私减少。策略判定正确:可逆变换的指标变化只能支持描述性结论,不能支撑因果/机制结论。",
+      "policy_correct": true
+    },
+    {
+      "id": "check-B-audit-vs-test-acc",
+      "question": "审计集准确率和独立测试准确率,该不该放在一起比较?",
+      "changed": "两个准确率数值:0.8275 与 0.6927",
+      "cause": "两个数值来自不同数据口径,不是同一个指标的变化",
+      "data_audit": "0.8275 = 成员+非成员混合审计集(400样本)上的准确率",
+      "data_test": "0.6927 = 独立测试集上的准确率",
+      "supported": "各自描述各自数据上的准确率",
+      "not_supported": "把两个不同数据上的准确率直接比较或混用,得出'模型在审计集上更好/更差'的结论",
+      "must_change": "任何把 0.8275 与 0.6927 混用或直接比较的句子",
+      "must_not_change": "分别标注口径后各自引用 0.8275(审计集)与 0.6927(测试集)的句子",
+      "verdict": "不应把审计集准确率与独立测试准确率放在一起比较。策略判定正确:不同数据口径的数值必须分别标注,不可混用。",
+      "policy_correct": true
+    },
+    {
+      "id": "check-C-title-only-no-trigger",
+      "question": "只改图标题,数据和计算都没变——该不该触发科学结论重审?",
+      "changed": "只改图标题/标签/配色/布局,数据和计算都没变",
+      "cause": "展示性变更,非数据或计算变更",
+      "data": "数据与计算均未变,指标数值不变",
+      "supported": "无新结论,展示性更新",
+      "not_supported": "不触发科学结论重审",
+      "must_change": "无(科学结论不变)",
+      "must_not_change": "所有科学结论句子(数据与计算未变)",
+      "verdict": "不应触发科学结论重审。策略判定正确:只改图标题、数据和计算都没变,属于不触发条件,只需展示性更新。",
+      "policy_correct": true
+    }
+  ],
+  "all_policy_correct": true,
+  "conclusion": "三个公开回归检查均通过:策略判定正确。检查A(温度→隐私)正确判定'不应把攻击下降解释成隐私减少';检查B(审计集 vs 测试集)正确判定'不应放在一起比较';检查C(只改标题)正确判定'不应触发科学结论重审'。策略 v1.0 在公开回归上未用错。"
+}

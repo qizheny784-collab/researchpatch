@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="ResearchPatch：研究员主导的科研变更工作台。沿研究图核查证据、论断和策略，查看真实隐私审计案例。">
+  <meta name="theme-color" content="#162c40"><title>ResearchPatch · 科研变更工作台</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="core.js" defer></script><script src="data.js" defer></script><script src="app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#graph" aria-label="ResearchPatch 首页"><span class="brand-mark">R<span>·</span></span><span>ResearchPatch<small>科研变更工作台</small></span></a>
+    <div class="workspace-label">RESEARCH WORKSPACE</div>
+    <div class="project-card"><span class="project-icon">↗</span><div>隐私审计研究<small>输出变换与评价口径</small></div><span class="project-dot"></span></div>
+    <nav aria-label="工作台导航">
+      <button class="nav-item active" data-view="graph"><span>⌘</span>研究图谱<span class="nav-count" id="nav-node-count">—</span></button>
+      <button class="nav-item" data-view="changes"><span>⇄</span>变更审阅<span class="nav-count">3</span></button>
+      <button class="nav-item" data-view="results"><span>▥</span>实验与证据</button>
+      <button class="nav-item" data-view="policy"><span>⤴</span>任务策略</button>
+      <button class="nav-item" data-view="about"><span>◎</span>项目与开源</button>
+    </nav>
+    <div class="sidebar-note"><span class="live-dot"></span>本地读取 · 无需实验沙盒<p>真实案例文件驱动。查看、筛选与导出都在浏览器中完成。</p></div>
+    <div class="sidebar-bottom"><span class="avatar">研</span><div>研究员主导<small>关键科学判断由人确认</small></div></div>
+  </aside>
+  <main>
+    <header class="topbar"><div class="breadcrumbs">工作空间 <span>/</span> 隐私审计研究</div><div class="top-actions"><button class="quiet" id="import-button">↑ 导入状态</button><input id="import-file" type="file" accept=".json,application/json" hidden><button class="quiet" id="export-button">↓ 导出状态</button><button class="primary small" id="present-button">演示视图 ↗</button></div></header>
+    <div class="content">
+      <section class="heading"><div><div class="eyebrow">EVIDENCE → CLAIM → REVISION</div><h1 id="view-title">研究图谱</h1><p id="view-subtitle">证据变了，哪些结论需要重新检查？</p></div><div class="version-pill"><span class="live-dot"></span><span id="version-label">读取项目状态</span></div></section>
+      <div class="provenance-bar"><span class="tag">实际研究案例</span><span id="provenance-text">CIFAR-10 · SmallCNN · 既有实验与复算修订</span><button class="text-button" id="limits-button">验证边界 ↗</button></div>
+      <section id="view-graph" class="view active">
+        <div class="graph-layout">
+          <div class="graph-main">
+            <div class="graph-toolbar"><div class="segmented" id="graph-mode"><button class="active" data-mode="focus">关键路径</button><button data-mode="all">完整研究图</button><button data-mode="impact">可能影响</button></div><label class="search-box"><span>⌕</span><input id="node-search" placeholder="搜索节点、论断或来源" aria-label="搜索研究节点"></label><button class="quiet icon" id="fit-button" aria-label="适应画布">⊞</button></div>
+            <div class="snapshot-toolbar"><span>状态版本</span><select id="snapshot-select" aria-label="选择研究图版本"></select><span id="graph-count"></span></div>
+            <div class="canvas-wrap" id="canvas-wrap"><svg id="graph-svg" role="img" aria-label="研究对象与证据关系图"></svg><div class="canvas-controls"><button id="zoom-out" aria-label="缩小">−</button><span id="zoom-label">100%</span><button id="zoom-in" aria-label="放大">＋</button></div><div id="graph-empty" hidden>没有匹配的节点，试试其他关键词。</div></div>
+            <div class="graph-legend"><span><i class="dot green"></i>已核查</span><span><i class="dot amber"></i>待核查 / 需调整</span><span><i class="dot blue"></i>候选</span><span><i class="dot gray"></i>历史 / 未验证</span><span class="legend-hint">拖动画布 · 滚轮缩放 · 点击节点</span></div>
+            <div class="graph-footnote" id="graph-footnote">图上的可达路径表示候选影响范围；不自动判定科学结论为假。</div>
+          </div>
+          <aside class="detail-panel" id="detail-panel" aria-live="polite"></aside>
+        </div>
+        <div class="bottom-insight"><span class="insight-mark">↳</span><div><strong>这次真正需要改的是哪句话？</strong><p>“始终猜非成员”的准确率由先验比例决定。复算修正数值后，继续核查依赖它的解释，而不是重跑全部研究。</p></div><button class="text-button" data-go="changes">查看变更单 →</button></div>
+      </section>
+      <section id="view-changes" class="view"><div id="change-list"></div></section>
+      <section id="view-results" class="view"><div class="section-head"><div><h2>同一模型，两种评价变化</h2><p>固定攻击的表现变化，与训练信息是否被删除，是两个不同的问题。</p></div><a class="quiet link" href="assets/results/calib_neg_control.json" download>温度实验原始结果 ↓</a></div><div class="evidence-grid"><article class="card"><div class="card-kicker">01 / OUTPUT TRANSFORMATION</div><h3>温度改变，预测类别保持不变</h3><p class="muted">同一批 200 成员 + 200 非成员；模型参数固定。</p><div id="temperature-chart"></div><div id="temperature-table"></div><div class="evidence-note">限定：在温度已知、完整正概率输出与足够数值精度下，映射可逆。不能据此称为遗忘成功。</div></article><article class="card"><div class="card-kicker">02 / PRIOR SENSITIVITY</div><h3>成员比例改变，怎样理解攻击准确率？</h3><p class="muted">基于既有分数重加权；不是新采集的独立审计集。</p><div class="control-row"><label>成员占比 <select id="prior-select"><option value="0.5">50%</option><option value="0.1" selected>10%</option></select></label><label>loss 阈值 <select id="threshold-select"><option value="0.01">0.01</option><option value="0.1" selected>0.1</option><option value="1">1.0</option></select></label></div><div id="prior-metrics"></div><div id="prior-chart"></div><div id="prior-detail"></div><div class="evidence-note">已修正：始终猜非成员的准确率 = 1 − 成员比例，与阈值无关。原错误列实际是当前攻击预测为非成员的比例。</div></article></div><article class="card full"><div class="section-head"><div><h3>证据索引</h3><p>保留原文件用于核对。结果文件不是对策略效率或迁移能力的独立验证。</p></div></div><div id="evidence-links"></div></article></section>
+      <section id="view-policy" class="view"><div id="policy-content"></div></section>
+      <section id="view-about" class="view"><div id="about-content"></div></section>
+    </div>
+    <footer class="app-footer"><span>ResearchPatch · 人类主导的科研变更协调</span><span>可验证证据 · 明确范围 · 保留历史</span></footer>
+  </main>
+  <div class="toast" id="toast" role="status"></div>
+  <dialog id="limits-dialog"><button class="dialog-close quiet" id="close-dialog" aria-label="关闭">×</button><div class="eyebrow">CURRENT VALIDATION</div><h2>已完成什么，尚未证明什么</h2><p>已完成实际模型训练、固定模型温度实验、既有分数的先验敏感性复算，以及研究图和项目内策略记录。</p><p>尚未完成遗忘模型比较、固定流程系统对照、独立策略迁移或效率收益测量。图谱展示不等于上述验证已完成。</p><p>本工作台对研究图进行浏览、版本比较和候选影响分析；它不会在浏览器中执行 SciencePal 实验、批准变更或自动修改平台记忆。导入文件在本地处理，不上传服务器。</p></dialog>
+</body></html>

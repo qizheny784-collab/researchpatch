@@ -1,0 +1,982 @@
+{
+  "project_id": "unlearning-privacy",
+  "revision": 13,
+  "display_notice": "机器遗忘与隐私风险研究 · 研究范围:输出变换对固定 MIA 评价的影响,以及如何避免把攻击表现变化解释成遗忘成功。校准负对照稳健性:固定 M_orig 参数只改温度 T=0.5/1/2/5,准确率不变(0.8275,审计集)但攻击 AUC 随温度变化(lossAUC 0.720→0.689,confAUC 0.688→0.648)。配对分层 bootstrap 差值 CI:T=0.5 相对 T=1 不显著,T=2.0/5.0 显著为负但幅度小。温度变换可逆(信息量不变),攻击变化不能说明隐私信息减少。类别内攻击表现不同,尚未证明类别难度对总体 AUC 的贡献(因果解释留作假设)。已启用指标变化审查策略 v1.0(项目内可调用)。原遗忘模型比较保留为后续工作。 新增成员比例敏感性分析(先验重加权,非新采集审计集):成员占比 50%→10% 时固定阈值攻击的准确率与 precision 下降、始终猜非成员准确率上升,但 AUC 不变(0.7200,重加权不改变两组分数相对排序)。这些变化不能解释为攻击失效或隐私信息减少;报告攻击准确率需标注审计集成员比例。",
+  "nodes": [
+    {
+      "id": "RQ1",
+      "type": "question",
+      "text": "遗忘后 MIA 成功率下降,能否证明样本被真正遗忘?",
+      "status": "needs_check",
+      "scope": "方法学质疑",
+      "version": "v1",
+      "source_refs": [
+        "Seo WACV2025",
+        "Rethinking Evaluation EMNLP2024"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "MECH-A",
+      "type": "claim",
+      "text": "(A) 真遗忘:成员/非成员不可区分,信息确实被清除",
+      "status": "proposed",
+      "scope": "MIA 下降的三种机制之一",
+      "version": "v1",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "MECH-B",
+      "type": "claim",
+      "text": "(B) 性能退化:模型整体变差,所有样本都像非成员",
+      "status": "proposed",
+      "scope": "MIA 下降的三种机制之一",
+      "version": "v1",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "MECH-C",
+      "type": "claim",
+      "text": "(C) 攻击失效/校准改变:置信度分布变了,信息仍在模型里",
+      "status": "proposed",
+      "scope": "MIA 下降的三种机制之一",
+      "version": "v1",
+      "source_refs": [
+        "Seo WACV2025"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "LIT-SEO",
+      "type": "literature",
+      "text": "Seo et al. WACV2025:校准微调分类头使 MIA 从 0.91 掉到 0.02,但未真正遗忘",
+      "status": "valid",
+      "scope": "直接证实 RQ1 担忧",
+      "version": "v1",
+      "source_refs": [
+        "WACV2025"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "LIT-RETHINK",
+      "type": "literature",
+      "text": "Wichert & Sikdar EMNLP2024:随机选忘集时 unlearned 模型几乎等于原模型,评估可能误导",
+      "status": "valid",
+      "scope": "评估本身可能误导",
+      "version": "v1",
+      "source_refs": [
+        "EMNLP2024 Findings"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "LIT-SURVEY",
+      "type": "literature",
+      "text": "Towards Reliable Forgetting survey:验证分行为类与参数类,存在标准间脱节",
+      "status": "valid",
+      "scope": "系统化验证方法",
+      "version": "v1",
+      "source_refs": [
+        "arXiv 2506.15115"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "LIT-GOOGLE",
+      "type": "literature",
+      "text": "Google:三样本相对检验(unlearned vs 安全重训 vs 原模型)",
+      "status": "valid",
+      "scope": "替代评估指标",
+      "version": "v1",
+      "source_refs": [
+        "Google Research Blog"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "LIT-CCS21",
+      "type": "literature",
+      "text": "Chen et al. CCS2021:遗忘过程本身留下痕迹,反而增加隐私风险",
+      "status": "valid",
+      "scope": "反向视角",
+      "version": "v1",
+      "source_refs": [
+        "CCS2021"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "H1",
+      "type": "hypothesis",
+      "text": "H1 假遗忘-校准假象:仅校准/后处理可显著降 MIA,但参数层面仍保留样本信息",
+      "status": "needs_check",
+      "scope": "对应机制 (C),待确认",
+      "version": "v1",
+      "source_refs": [
+        "Seo WACV2025"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "H2",
+      "type": "hypothesis",
+      "text": "H2 性能退化混淆:retain 性能显著下降时,MIA 下降主要由整体退化驱动",
+      "status": "needs_check",
+      "scope": "对应机制 (B),待确认",
+      "version": "v1",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "H3",
+      "type": "hypothesis",
+      "text": "H3 攻击失效 vs 真遗忘可区分:换攻击后 MIA 恢复程度可判别",
+      "status": "needs_check",
+      "scope": "对应机制 (C) vs (A),核心判别实验,待确认",
+      "version": "v1",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "EXP-PLAN",
+      "type": "experiment",
+      "text": "小实验:样本级删除,对比 M_orig/M_retrain/M_unlearn(NegGrad)+M_calib,多套 MIA 验证 H1-H3。可行性已跑通但 MNIST 两类任务太简单,MIA 无效,需调整任务难度。",
+      "status": "needs_narrowing",
+      "scope": "可行性完成,任务难度需调整,完整实验待用户确认",
+      "version": "v3",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "MODEL-ORIG",
+      "type": "experiment",
+      "text": "原模型 M_orig:本轮采用 CIFAR-10 + SmallCNN(不用 ResNet,CPU-only 环境),训练子集 20000 张按类别分层抽样,20 轮训练完成,基线隐私审计通过",
+      "status": "done",
+      "scope": "三个模型之一,待确认",
+      "version": "v2",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "MODEL-RETRAIN",
+      "type": "experiment",
+      "text": "M_retrain:在 D\\D_f 上重训(金标准,真遗忘参考)",
+      "status": "needs_check",
+      "scope": "三个模型之一,待确认",
+      "version": "v1",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "MODEL-UNLEARN",
+      "type": "experiment",
+      "text": "M_unlearn:轻量近似遗忘(NegGrad 梯度上升)",
+      "status": "needs_check",
+      "scope": "三个模型之一,待确认",
+      "version": "v1",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "MODEL-CALIB",
+      "type": "experiment",
+      "text": "M_calib:仅后处理校准,不做遗忘(负对照,验证 H1)",
+      "status": "needs_check",
+      "scope": "关键负对照,待确认",
+      "version": "v1",
+      "source_refs": [
+        "Seo WACV2025"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "CTRL-RETAIN",
+      "type": "claim",
+      "text": "对照1:retain 集性能(区分机制 B)",
+      "status": "needs_check",
+      "scope": "区分机制对照,待确认",
+      "version": "v1",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "CTRL-MULTIATTACK",
+      "type": "claim",
+      "text": "对照2:多套攻击+阈值校准(区分机制 C)",
+      "status": "needs_check",
+      "scope": "区分机制对照,待确认",
+      "version": "v1",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "CTRL-RETRAINREF",
+      "type": "claim",
+      "text": "对照3:金标准重训参考(区分 A vs C)",
+      "status": "needs_check",
+      "scope": "区分机制对照,待确认",
+      "version": "v1",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "CTRL-PARAMDIST",
+      "type": "claim",
+      "text": "对照4:参数/表示距离(区分行为下降 vs 参数未清除)",
+      "status": "needs_check",
+      "scope": "区分机制对照,待确认",
+      "version": "v1",
+      "source_refs": [
+        "Seo WACV2025"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "CTRL-CALIB",
+      "type": "claim",
+      "text": "对照5:仅校准的假遗忘负对照(关键)",
+      "status": "needs_check",
+      "scope": "区分机制对照,待确认",
+      "version": "v1",
+      "source_refs": [
+        "Seo WACV2025"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "DATA-SPLIT",
+      "type": "data",
+      "text": "数据划分:D_f 忘集/D_r 保留集/D_test 测试集/D_shadow 影子数据,攻击与评价数据不相交",
+      "status": "needs_check",
+      "scope": "攻击数据与评价数据提前分好,待确认",
+      "version": "v1",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "DEC-NEXT",
+      "type": "decision",
+      "text": "下一步:用户确认 M_orig 基线审计结果后,训练 M_retrain/M_unlearn/M_calib 并做机制区分对照(A 真遗忘/B 性能退化/C 攻击失效)",
+      "status": "needs_check",
+      "scope": "待用户确认复算结果后决定",
+      "version": "v3",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "EXP-FEASIBILITY",
+      "type": "experiment",
+      "text": "可行性实验(MNIST 前2类子集,SmallCNN,5轮CPU):模型能训练(acc 0.998),攻击评估流程跑通,评价集 MIA AUC 0.4712(略低于随机,按实际结果报告),攻击调参与评价数据分开,耗时17.1秒",
+      "status": "done",
+      "scope": "因 CIFAR-10 下载过慢改用 MNIST 缩小方案",
+      "version": "v1",
+      "source_refs": [
+        "unlearning-privacy/experiments/logs/feasibility_result.json"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "EXP-RECHECK",
+      "type": "experiment",
+      "text": "复算:0.998 是训练准确率(训练acc=0.997,测试acc=1.000)。MNIST前2类太简单,模型对成员/非成员都近零loss(0.0011/0.0015),loss-based MIA 无法区分。AUC 0.48(95%CI [0.39,0.58] 含0.5),与随机无显著差异。方向检查通过(反向=1-正向)。",
+      "status": "done",
+      "scope": "任务难度是关键问题:MNIST两类太简单,需调整任务难度或换攻击",
+      "version": "v1",
+      "source_refs": [
+        "unlearning-privacy/experiments/recheck/recheck_result.json"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "ADJUST-SCHEME",
+      "type": "decision",
+      "text": "方案调整:MNIST两类/SmallCNN 任务太简单导致MIA无效;CIFAR-10 本地数据包已就绪(60000张,验证通过),可回到原方案(CIFAR-10+ResNet-18 或 CIFAR-10+SmallCNN)",
+      "status": "needs_check",
+      "scope": "因CIFAR-10下载过慢改用MNIST缩小方案,任务难度需重新评估",
+      "version": "v2",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "DATA-CIFAR10",
+      "type": "data",
+      "text": "CIFAR-10 本地数据包就绪(60000 张,5训练batch+1测试batch,验证通过,不再联网下载)",
+      "status": "done",
+      "scope": "数据准备",
+      "version": "v1",
+      "source_refs": [
+        "cifar-10-python.tar.gz (用户上传,MD5 已核对)"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "EXP-MORIG-BASELINE",
+      "type": "experiment",
+      "text": "M_orig 基线隐私审计完成(CIFAR-10+SmallCNN,20000张分层抽样,20轮CPU):训练acc=0.9951 loss=0.0223,测试acc=0.6927 loss=1.6491;loss-based MIA AUC=0.7200(95%CI [0.6679,0.7670]),confidence-based MIA AUC=0.6879(95%CI [0.6327,0.7383]),两种攻击均有区分力",
+      "status": "done",
+      "scope": "实验",
+      "version": "v1",
+      "source_refs": [
+        "unlearning-privacy/experiments/morig_baseline/output/morig_result.json"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "ANALYSIS-CLASS-CONFOUND",
+      "type": "finding",
+      "text": "类别难度混淆检查(已修正):非成员 loss 高度依赖类别——高 loss(>1.0)非成员 67/200 集中在难类别(cat 17, bird 10, airplane 6, deer 6, dog 6, frog 6),易类别(automobile 0.19, ship 0.52, truck 0.73)loss 低。类别内 AUC 检查显示:多数类别内 AUC>0.6(cat 0.908, bird 0.82, horse 0.807),airplane 0.571/automobile 0.608/truck 0.65 较低——类别内攻击表现不同。证据边界:类别内 AUC 与类别组成只能支持'类别内攻击表现不同';尚未证明类别难度对总体 AUC 的贡献(因果解释留作假设,需控制其他条件验证)。限制:类别内样本少(truck 成员仅10, automobile 非成员仅12),类别内 AUC 有较大不确定性。",
+      "status": "needs_narrowing",
+      "scope": "M_orig 基线审计的混淆检查",
+      "version": "v4",
+      "source_refs": [
+        "unlearning-privacy/experiments/morig_baseline/output/class_analysis.json",
+        "unlearning-privacy/experiments/morig_baseline/output/class_auc.json",
+        "unlearning-privacy/experiments/morig_baseline/output/calib_bootstrap.json",
+        "unlearning-privacy/experiments/morig_baseline/output/per_sample_scores.json"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "ANALYSIS-GEN-GAP",
+      "type": "finding",
+      "text": "泛化差距与攻击:训练 acc=0.9951 vs 测试 acc=0.6927(差距 0.30),训练 loss=0.0223 vs 测试 loss=1.6491(差距 1.63)。模型过拟合训练样本(成员 loss 极低 96.5%<0.1),这是 MIA 有效的基础——攻击表现与泛化差距正相关",
+      "status": "valid",
+      "scope": "M_orig 基线审计的泛化分析",
+      "version": "v1",
+      "source_refs": [
+        "unlearning-privacy/experiments/morig_baseline/output/morig_result.json"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "ANALYSIS-CALIB-NEGCTRL",
+      "type": "finding",
+      "text": "校准负对照(固定 M_orig 参数,只改温度 T=0.5/1/2/5,同一批样本):准确率完全不变(0.8275,温度缩放不改变 argmax 预测类别),但攻击 AUC 随温度变化——loss-based AUC 0.720(T=1)→0.689(T=5),confidence-based AUC 0.688→0.648。配对分层 bootstrap 差值 CI:T=0.5 相对 T=1 不显著(CI 含0),T=2.0 与 T=5.0 显著为负但幅度小(最大约 -0.03~-0.04)。温度变换可逆(信息量不变),因此攻击 AUC 下降反映固定攻击对可逆重参数化的敏感性,不能说明隐私信息减少,也不能把攻击变化说成遗忘成功。",
+      "status": "valid",
+      "scope": "校准负对照(不训练新模型)",
+      "version": "v2",
+      "source_refs": [
+        "unlearning-privacy/experiments/morig_baseline/output/calib_neg_control.json",
+        "unlearning-privacy/experiments/morig_baseline/output/calib_bootstrap.json"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "ANALYSIS-TASKDIFF-CAUTION",
+      "type": "claim",
+      "text": "任务难度归因需谨慎:MNIST 前2类(无区分力 AUC 0.48)与 CIFAR-10(有区分力 AUC 0.72)之间同时变了多个条件——数据集、类别数(2 vs 10)、模型、训练轮数(5 vs 20)。不能把 MIA 有效性的差异单独归因于任务难度,需在控制其他条件后验证。",
+      "status": "needs_check",
+      "scope": "任务难度归因的边界",
+      "version": "v1",
+      "source_refs": [
+        "unlearning-privacy/experiments/recheck/recheck_result.json",
+        "unlearning-privacy/experiments/morig_baseline/output/morig_result.json"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "ANALYSIS-CALIB-BOOTSTRAP",
+      "type": "finding",
+      "text": "校准负对照稳健性(配对、按成员身份分层的 bootstrap,2000 次,种子 20261101):相对 T=1 的 AUC 差值 CI——loss-based: T=0.5 CI[-0.0133,0.0083](含0,不显著),T=2.0 CI[-0.0140,-0.0028](显著),T=5.0 CI[-0.0486,-0.0138](显著);conf-based: T=0.5 CI[-0.0160,0.0067](含0),T=2.0 CI[-0.0146,-0.0019](显著),T=5.0 CI[-0.0615,-0.0201](显著)。差值随温度增大而增大且 CI 变显著,但幅度小(最大约 -0.03~-0.04);T=0.5 与 T=1 无显著差异。所有温度都报告,不挑某个温度单独讲。",
+      "status": "valid",
+      "scope": "校准负对照稳健性",
+      "version": "v1",
+      "source_refs": [
+        "unlearning-privacy/experiments/morig_baseline/output/calib_bootstrap.json"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "ANALYSIS-CALIB-REVERSIBLE",
+      "type": "finding",
+      "text": "温度可逆性核对:温度缩放 p_T=softmax(z/T) 是概率单纯形上的双射(可逆)。给定温度 T 和完整输出概率 p_T,可精确还原变换前概率 p_1=softmax(T*log(p_T))(数值误差 ~1e-7)。因此温度变换不改变信息量——攻击 AUC 变化只反映固定攻击分数对可逆重参数化的敏感性,不能说明隐私信息减少。",
+      "status": "valid",
+      "scope": "输出变换可逆性",
+      "version": "v1",
+      "source_refs": [
+        "unlearning-privacy/experiments/morig_baseline/output/calib_bootstrap.json"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "SCOPE-OUTPUT-TRANSFORM",
+      "type": "decision",
+      "text": "研究范围调整:本项目研究范围定为'输出变换对固定 MIA 评价的影响,以及如何避免把攻击表现变化解释成遗忘成功'。原遗忘模型比较(M_retrain/M_unlearn/M_calib)保留为后续工作,不再挡住本轮研究收尾。",
+      "status": "decided",
+      "scope": "研究范围",
+      "version": "v1",
+      "source_refs": [],
+      "updated_by": "agent"
+    },
+    {
+      "id": "ANALYSIS-ACC-CLARIFY",
+      "type": "claim",
+      "text": "准确率澄清:0.8275 是成员+非成员混合审计集(200 成员 + 200 非成员,共 400 样本)上的准确率,不是独立测试集上的 0.6927。两者不可混用。",
+      "status": "valid",
+      "scope": "准确率口径",
+      "version": "v1",
+      "source_refs": [
+        "unlearning-privacy/experiments/morig_baseline/output/calib_bootstrap.json"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "POLICY-METRIC-CHANGE",
+      "type": "policy",
+      "text": "指标变化审查策略 v1.0(项目内可调用):一个评价指标/数值变了,先弄清楚改了什么、指标在什么数据上计算、它能支持多大范围的解释,再决定论文里哪些话要改。触发:指标/数值变化且可能支撑科学结论;不同数据口径数值被混用;输出变换改变指标。检查:①改了什么 ②指标在什么数据上计算 ③能支持多大范围解释(区分描述性 vs 因果/机制) ④论文哪些话要改。不触发:只改图标题/展示,数据和计算没变。",
+      "status": "active",
+      "scope": "项目内可调用策略",
+      "version": "v1.0",
+      "source_refs": [
+        "unlearning-privacy/design/metric-change-review-policy.md"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "POLICY-FORMATION",
+      "type": "process",
+      "text": "策略形成来源(人的纠正如何形成这条策略):用户多轮纠正归纳——①校准负对照(模型参数/预测类别不变时攻击表现变化,不能把攻击变化说成遗忘成功);②温度可逆性(可逆变换的指标变化不能解释为隐私减少,未测机制不命名);③类别难度(类别内 AUC 和类别组成能支持什么就写到什么程度,因果解释留作假设);④准确率口径(0.8275 审计集 vs 0.6927 测试集不可混用)。归纳为:指标变化先弄清改了什么/在什么数据上算/能支持多大范围解释,再决定论文哪些话要改。",
+      "status": "valid",
+      "scope": "策略形成来源",
+      "version": "v1",
+      "source_refs": [
+        "unlearning-privacy/design/metric-change-review-policy.md"
+      ],
+      "updated_by": "agent"
+    },
+    {
+      "id": "ANALYSIS-MEMBER-PROP",
+      "type": "finding",
+      "text": "成员比例敏感性分析(先验重加权,基于已有逐样本分数,非新采集审计集):保持成员/非成员 loss 分布不变,按成员比例 50% 与 10% 重加权。loss-based 攻击,阈值 0.01/0.1/1.0(全部报告,不挑最好)。50%: acc 0.690/0.710/0.668, precision 0.656/0.639/0.601, recall 0.800/0.965/1.000, FPR 0.420/0.545/0.665, 始终猜非成员 0.390/0.245/0.168。10%: acc 0.602/0.506/0.402, precision 0.175/0.164/0.143, recall 0.800/0.965/1.000, FPR 0.420/0.545/0.665, 始终猜非成员 0.542/0.413/0.302。AUC 在重加权下不变(0.7200,只依赖两组分数相对排序,不依赖先验比例)。成员占比下降时固定阈值攻击的准确率与 precision 下降、始终猜非成员准确率上升,但不能解释为攻击失效或隐私信息减少。",
+      "status": "valid",
+      "scope": "成员比例敏感性分析(先验重加权,非新采集审计集)",
+      "version": "v1",
+      "source_refs": [
+        "unlearning-privacy/experiments/morig_baseline/output/per_sample_scores.json",
+        "analysis/member_prop_sensitivity_result.json",
+        "analysis/member_prop_policy_application.json"
+      ],
+      "updated_by": "agent"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "RQ1",
+      "to": "MECH-A",
+      "relation": "constrains",
+      "basis": "RQ1 拆解为三种机制",
+      "confirmed": true
+    },
+    {
+      "id": "e2",
+      "from": "RQ1",
+      "to": "MECH-B",
+      "relation": "constrains",
+      "basis": "RQ1 拆解为三种机制",
+      "confirmed": true
+    },
+    {
+      "id": "e3",
+      "from": "RQ1",
+      "to": "MECH-C",
+      "relation": "constrains",
+      "basis": "RQ1 拆解为三种机制",
+      "confirmed": true
+    },
+    {
+      "id": "e4",
+      "from": "LIT-SEO",
+      "to": "MECH-C",
+      "relation": "supports",
+      "basis": "校准可刷低 MIA,信息仍在",
+      "confirmed": true
+    },
+    {
+      "id": "e5",
+      "from": "LIT-RETHINK",
+      "to": "RQ1",
+      "relation": "supports",
+      "basis": "评估本身可能误导",
+      "confirmed": true
+    },
+    {
+      "id": "e6",
+      "from": "LIT-SURVEY",
+      "to": "RQ1",
+      "relation": "supports",
+      "basis": "验证方法存在脱节",
+      "confirmed": true
+    },
+    {
+      "id": "e7",
+      "from": "LIT-GOOGLE",
+      "to": "EXP-PLAN",
+      "relation": "supports",
+      "basis": "三样本相对检验作为替代指标",
+      "confirmed": true
+    },
+    {
+      "id": "e8",
+      "from": "LIT-CCS21",
+      "to": "RQ1",
+      "relation": "supports",
+      "basis": "遗忘本身泄露隐私",
+      "confirmed": true
+    },
+    {
+      "id": "e9",
+      "from": "MECH-C",
+      "to": "H1",
+      "relation": "derived_from",
+      "basis": "H1 对应机制 C",
+      "confirmed": true
+    },
+    {
+      "id": "e10",
+      "from": "MECH-B",
+      "to": "H2",
+      "relation": "derived_from",
+      "basis": "H2 对应机制 B",
+      "confirmed": true
+    },
+    {
+      "id": "e11",
+      "from": "MECH-C",
+      "to": "H3",
+      "relation": "derived_from",
+      "basis": "H3 对应机制 C vs A",
+      "confirmed": true
+    },
+    {
+      "id": "e12",
+      "from": "MECH-A",
+      "to": "H3",
+      "relation": "derived_from",
+      "basis": "H3 对应机制 C vs A",
+      "confirmed": true
+    },
+    {
+      "id": "e13",
+      "from": "H1",
+      "to": "EXP-PLAN",
+      "relation": "constrains",
+      "basis": "实验验证 H1",
+      "confirmed": true
+    },
+    {
+      "id": "e14",
+      "from": "H2",
+      "to": "EXP-PLAN",
+      "relation": "constrains",
+      "basis": "实验验证 H2",
+      "confirmed": true
+    },
+    {
+      "id": "e15",
+      "from": "H3",
+      "to": "EXP-PLAN",
+      "relation": "constrains",
+      "basis": "实验验证 H3",
+      "confirmed": true
+    },
+    {
+      "id": "e16",
+      "from": "EXP-PLAN",
+      "to": "MODEL-ORIG",
+      "relation": "constrains",
+      "basis": "实验含 M_orig",
+      "confirmed": true
+    },
+    {
+      "id": "e17",
+      "from": "EXP-PLAN",
+      "to": "MODEL-RETRAIN",
+      "relation": "constrains",
+      "basis": "实验含 M_retrain",
+      "confirmed": true
+    },
+    {
+      "id": "e18",
+      "from": "EXP-PLAN",
+      "to": "MODEL-UNLEARN",
+      "relation": "constrains",
+      "basis": "实验含 M_unlearn",
+      "confirmed": true
+    },
+    {
+      "id": "e19",
+      "from": "EXP-PLAN",
+      "to": "MODEL-CALIB",
+      "relation": "constrains",
+      "basis": "实验含 M_calib 负对照",
+      "confirmed": true
+    },
+    {
+      "id": "e20",
+      "from": "EXP-PLAN",
+      "to": "CTRL-RETAIN",
+      "relation": "constrains",
+      "basis": "对照1",
+      "confirmed": true
+    },
+    {
+      "id": "e21",
+      "from": "EXP-PLAN",
+      "to": "CTRL-MULTIATTACK",
+      "relation": "constrains",
+      "basis": "对照2",
+      "confirmed": true
+    },
+    {
+      "id": "e22",
+      "from": "EXP-PLAN",
+      "to": "CTRL-RETRAINREF",
+      "relation": "constrains",
+      "basis": "对照3",
+      "confirmed": true
+    },
+    {
+      "id": "e23",
+      "from": "EXP-PLAN",
+      "to": "CTRL-PARAMDIST",
+      "relation": "constrains",
+      "basis": "对照4",
+      "confirmed": true
+    },
+    {
+      "id": "e24",
+      "from": "EXP-PLAN",
+      "to": "CTRL-CALIB",
+      "relation": "constrains",
+      "basis": "对照5",
+      "confirmed": true
+    },
+    {
+      "id": "e25",
+      "from": "EXP-PLAN",
+      "to": "DATA-SPLIT",
+      "relation": "constrains",
+      "basis": "数据划分",
+      "confirmed": true
+    },
+    {
+      "id": "e26",
+      "from": "EXP-PLAN",
+      "to": "DEC-NEXT",
+      "relation": "depends_on",
+      "basis": "方案待确认后启动",
+      "confirmed": false
+    },
+    {
+      "id": "e27",
+      "from": "EXP-PLAN",
+      "to": "EXP-FEASIBILITY",
+      "relation": "executes",
+      "basis": "可行性实验是实验方案的第一步执行",
+      "confirmed": true
+    },
+    {
+      "id": "e28",
+      "from": "EXP-FEASIBILITY",
+      "to": "DEC-NEXT",
+      "relation": "informs",
+      "basis": "可行性结果决定下一步(是否启动完整实验)",
+      "confirmed": true
+    },
+    {
+      "id": "e29",
+      "from": "EXP-FEASIBILITY",
+      "to": "EXP-RECHECK",
+      "relation": "extends",
+      "basis": "复算是对可行性结果的检查",
+      "confirmed": true
+    },
+    {
+      "id": "e30",
+      "from": "EXP-RECHECK",
+      "to": "ADJUST-SCHEME",
+      "relation": "informs",
+      "basis": "复算发现任务太简单,需调整方案",
+      "confirmed": true
+    },
+    {
+      "id": "e31",
+      "from": "ADJUST-SCHEME",
+      "to": "DEC-NEXT",
+      "relation": "informs",
+      "basis": "方案调整决定下一步",
+      "confirmed": true
+    },
+    {
+      "id": "e32",
+      "from": "DATA-CIFAR10",
+      "to": "ADJUST-SCHEME",
+      "relation": "informs",
+      "basis": "CIFAR-10 本地数据就绪,可回到原方案",
+      "confirmed": true
+    },
+    {
+      "id": "e33",
+      "from": "ADJUST-SCHEME",
+      "to": "DATA-CIFAR10",
+      "relation": "replaces",
+      "basis": "MNIST 缩小方案被 CIFAR-10 本地数据替代",
+      "confirmed": true
+    },
+    {
+      "id": "e34",
+      "from": "DATA-CIFAR10",
+      "to": "DEC-NEXT",
+      "relation": "informs",
+      "basis": "基于 CIFAR-10 提出小规模实验方案",
+      "confirmed": true
+    },
+    {
+      "id": "e35",
+      "from": "EXP-MORIG-BASELINE",
+      "to": "MODEL-ORIG",
+      "relation": "validates",
+      "basis": "M_orig 基线审计完成,验证 SmallCNN 方案下 MIA 基线有效",
+      "confirmed": true
+    },
+    {
+      "id": "e36",
+      "from": "MODEL-ORIG",
+      "to": "EXP-MORIG-BASELINE",
+      "relation": "uses",
+      "basis": "M_orig 模型用于基线隐私审计",
+      "confirmed": true
+    },
+    {
+      "id": "e37",
+      "from": "EXP-MORIG-BASELINE",
+      "to": "DEC-NEXT",
+      "relation": "informs",
+      "basis": "M_orig 基线结果指导下一步训练其他模型",
+      "confirmed": true
+    },
+    {
+      "id": "e-morig-class",
+      "from": "EXP-MORIG-BASELINE",
+      "to": "ANALYSIS-CLASS-CONFOUND",
+      "relation": "produces",
+      "basis": "M_orig 逐样本分数按类别分层分析",
+      "confirmed": true
+    },
+    {
+      "id": "e-class-mech",
+      "from": "ANALYSIS-CLASS-CONFOUND",
+      "to": "MECH-A",
+      "relation": "constrains",
+      "basis": "类别难度混淆需在遗忘对照中排除,否则 MIA 下降可能只是难度/性能变化",
+      "confirmed": true
+    },
+    {
+      "id": "e-morig-gengap",
+      "from": "EXP-MORIG-BASELINE",
+      "to": "ANALYSIS-GEN-GAP",
+      "relation": "produces",
+      "basis": "训练/测试 acc/loss 对比",
+      "confirmed": true
+    },
+    {
+      "id": "e-gengap-mechb",
+      "from": "ANALYSIS-GEN-GAP",
+      "to": "MECH-B",
+      "relation": "supports",
+      "basis": "过拟合(泛化差距大)是 MIA 有效的基础,性能退化会削弱 MIA",
+      "confirmed": true
+    },
+    {
+      "id": "e-morig-calib",
+      "from": "EXP-MORIG-BASELINE",
+      "to": "ANALYSIS-CALIB-NEGCTRL",
+      "relation": "produces",
+      "basis": "固定 M_orig 参数,温度缩放前向计算",
+      "confirmed": true
+    },
+    {
+      "id": "e-calib-rq1",
+      "from": "ANALYSIS-CALIB-NEGCTRL",
+      "to": "RQ1",
+      "relation": "supports",
+      "basis": "校准改变本身可改变攻击 AUC,支持 RQ1 方法学质疑",
+      "confirmed": true
+    },
+    {
+      "id": "e-calib-mecha",
+      "from": "ANALYSIS-CALIB-NEGCTRL",
+      "to": "MECH-A",
+      "relation": "supports",
+      "basis": "校准机制(仅改 softmax 锐度)可致 MIA 下降,参数保留信息",
+      "confirmed": true
+    },
+    {
+      "id": "e-class-taskdiff",
+      "from": "ANALYSIS-CLASS-CONFOUND",
+      "to": "ANALYSIS-TASKDIFF-CAUTION",
+      "relation": "constrains",
+      "basis": "类别难度与任务难度相关,归因需谨慎",
+      "confirmed": true
+    },
+    {
+      "id": "e-recheck-taskdiff",
+      "from": "EXP-RECHECK",
+      "to": "ANALYSIS-TASKDIFF-CAUTION",
+      "relation": "constrains",
+      "basis": "MNIST 无区分力不能单独归因任务难度(多条件同时变化)",
+      "confirmed": true
+    },
+    {
+      "id": "e-morig-boot",
+      "from": "EXP-MORIG-BASELINE",
+      "to": "ANALYSIS-CALIB-BOOTSTRAP",
+      "relation": "produces",
+      "basis": "复用 M_orig 参数与 logits 做配对分层 bootstrap",
+      "confirmed": true
+    },
+    {
+      "id": "e-boot-calib",
+      "from": "ANALYSIS-CALIB-BOOTSTRAP",
+      "to": "ANALYSIS-CALIB-NEGCTRL",
+      "relation": "refines",
+      "basis": "bootstrap 差值 CI 细化校准负对照结论(幅度小、部分不显著)",
+      "confirmed": true
+    },
+    {
+      "id": "e-rev-calib",
+      "from": "ANALYSIS-CALIB-REVERSIBLE",
+      "to": "ANALYSIS-CALIB-NEGCTRL",
+      "relation": "constrains",
+      "basis": "温度变换可逆,信息量不变,攻击变化不能说明隐私信息减少",
+      "confirmed": true
+    },
+    {
+      "id": "e-calib-scope",
+      "from": "ANALYSIS-CALIB-NEGCTRL",
+      "to": "SCOPE-OUTPUT-TRANSFORM",
+      "relation": "supports",
+      "basis": "校准负对照支持'输出变换影响固定 MIA 评价'的研究范围",
+      "confirmed": true
+    },
+    {
+      "id": "e-class-scope",
+      "from": "ANALYSIS-CLASS-CONFOUND",
+      "to": "SCOPE-OUTPUT-TRANSFORM",
+      "relation": "constrains",
+      "basis": "类别难度混淆需在输出变换研究中控制",
+      "confirmed": true
+    },
+    {
+      "id": "e-acc-calib",
+      "from": "ANALYSIS-ACC-CLARIFY",
+      "to": "ANALYSIS-CALIB-NEGCTRL",
+      "relation": "constrains",
+      "basis": "0.8275 是审计集准确率,非独立测试集 0.6927",
+      "confirmed": true
+    },
+    {
+      "id": "e-policy-form",
+      "from": "POLICY-FORMATION",
+      "to": "POLICY-METRIC-CHANGE",
+      "relation": "forms",
+      "basis": "用户多轮纠正归纳为指标变化审查策略",
+      "confirmed": true
+    },
+    {
+      "id": "e-policy-calib",
+      "from": "POLICY-METRIC-CHANGE",
+      "to": "ANALYSIS-CALIB-NEGCTRL",
+      "relation": "checks",
+      "basis": "策略检查对象:温度变化→攻击下降能否解释为隐私减少",
+      "confirmed": true
+    },
+    {
+      "id": "e-policy-acc",
+      "from": "POLICY-METRIC-CHANGE",
+      "to": "ANALYSIS-ACC-CLARIFY",
+      "relation": "checks",
+      "basis": "策略检查对象:审计集准确率 vs 独立测试准确率是否可混用",
+      "confirmed": true
+    },
+    {
+      "id": "e-policy-class",
+      "from": "POLICY-METRIC-CHANGE",
+      "to": "ANALYSIS-CLASS-CONFOUND",
+      "relation": "checks",
+      "basis": "策略检查对象:类别难度结论的证据边界",
+      "confirmed": true
+    },
+    {
+      "id": "e-policy-rev",
+      "from": "POLICY-METRIC-CHANGE",
+      "to": "ANALYSIS-CALIB-REVERSIBLE",
+      "relation": "checks",
+      "basis": "策略检查对象:可逆变换的指标变化不能解释为信息减少",
+      "confirmed": true
+    },
+    {
+      "id": "e-mprop-baseline",
+      "from": "EXP-MORIG-BASELINE",
+      "to": "ANALYSIS-MEMBER-PROP",
+      "relation": "produces",
+      "basis": "复用 M_orig 基线审计的逐样本 loss 分数做成员比例敏感性分析",
+      "confirmed": true
+    },
+    {
+      "id": "e-mprop-calib",
+      "from": "ANALYSIS-MEMBER-PROP",
+      "to": "ANALYSIS-CALIB-NEGCTRL",
+      "relation": "constrains",
+      "basis": "成员比例敏感性说明攻击指标(acc/precision)依赖审计集构成,与校准负对照的 AUC 变化需区分口径",
+      "confirmed": true
+    },
+    {
+      "id": "e-mprop-acc",
+      "from": "ANALYSIS-MEMBER-PROP",
+      "to": "ANALYSIS-ACC-CLARIFY",
+      "relation": "constrains",
+      "basis": "成员比例敏感性要求报告攻击准确率时标注审计集成员比例,与准确率口径澄清一致",
+      "confirmed": true
+    },
+    {
+      "id": "e-mprop-policy",
+      "from": "POLICY-METRIC-CHANGE",
+      "to": "ANALYSIS-MEMBER-PROP",
+      "relation": "checks",
+      "basis": "策略 v1.0 检查对象:成员比例变化→攻击指标变化能否解释为攻击失效/隐私减少",
+      "confirmed": true
+    },
+    {
+      "id": "e-mprop-rq1",
+      "from": "ANALYSIS-MEMBER-PROP",
+      "to": "RQ1",
+      "relation": "constrains",
+      "basis": "成员比例敏感性提示:攻击表现变化需区分审计集构成影响与真实遗忘/隐私变化",
+      "confirmed": true
+    }
+  ],
+  "support_groups": [
+    {
+      "id": "sg1",
+      "claim_id": "MECH-C",
+      "mode": "any",
+      "member_ids": [
+        "LIT-SEO"
+      ]
+    },
+    {
+      "id": "sg2",
+      "claim_id": "H1",
+      "mode": "any",
+      "member_ids": [
+        "MODEL-CALIB",
+        "CTRL-CALIB"
+      ]
+    }
+  ]
+}

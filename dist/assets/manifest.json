@@ -1,0 +1,46 @@
+{
+  "assets/current.json": {
+    "bytes": 35267,
+    "sha256": "b990bac4fd174ef8dcf56256b19449e0ae35b4a0fd55263fa79997ac2fc0d1ca"
+  },
+  "assets/metric-change-review-policy.md": {
+    "bytes": 5737,
+    "sha256": "8a2b1f7a1608ad0fc1c82487b984d78c12e029be2764777c4c361df3392b2000"
+  },
+  "assets/original-rev12.json": {
+    "bytes": 32411,
+    "sha256": "fac45efe715d6093720e07c8f12aa6e3612f0116c81fec57d43ae31e90bd0123"
+  },
+  "assets/original-rev13.json": {
+    "bytes": 35557,
+    "sha256": "c62503157c7bb901308bab618192c31a0ec8a952be7759168e76c106bed83a53"
+  },
+  "assets/results/calib_bootstrap.json": {
+    "bytes": 5877,
+    "sha256": "058ab226d65777a7d208d99e6948c24a1d19eb552fc2a0e7ca5ba499543ac3bb"
+  },
+  "assets/results/calib_neg_control.json": {
+    "bytes": 2687,
+    "sha256": "75defaa301d6c8d7ab34cbb23c27cc00dc54539ffbb707842a4b5f3309e15644"
+  },
+  "assets/results/class_auc.json": {
+    "bytes": 2990,
+    "sha256": "3dc9bbe8823373b84b315e0560534be6d18bc503dd602b0db3d7453b8a44ee17"
+  },
+  "assets/results/member-prior-corrected.json": {
+    "bytes": 2053,
+    "sha256": "803087be161e2b7d5a42978f1fb65e8c64c9fb943c9ce1364bb37c0d0167400a"
+  },
+  "assets/results/morig_result.json": {
+    "bytes": 2032,
+    "sha256": "ff7fba0c692fc1d4fa816c02e0ef13561c95fd7a8ba92e1ddf868114a449de04"
+  },
+  "assets/results/policy-regression-original.json": {
+    "bytes": 3541,
+    "sha256": "b72e29efe93e8f46b3bc6e90cf06d96835ec5f342df711b3fc634f16cb26d886"
+  },
+  "assets/results/prior-scores.json": {
+    "bytes": 8419,
+    "sha256": "7d02866b63c407d0eef87544731bdea2c2b990c78a62e383b0c06679861b19ca"
+  }
+}

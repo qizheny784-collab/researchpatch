@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+node_modules/
+*.pt
+*.pth
+*.tar.gz
+*.partial
+.DS_Store
+.openai/.runtime/
+dist/researchpatch-source.zip
+output/

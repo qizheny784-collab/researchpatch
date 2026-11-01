@@ -1,0 +1,12 @@
+{
+  "name": "researchpatch",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Human-led research change coordination workbench with a reproducible privacy-audit case.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test tests/core.test.cjs",
+    "start": "python scripts/serve.py",
+    "reproduce": "python scripts/reproduce.py"
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "note": "\u7c7b\u522b\u6bd4\u4f8b + \u7c7b\u522b\u5185 AUC(\u7528\u5df2\u6709 per_sample_scores)\u3002\u7c7b\u522b\u5185\u6837\u672c\u5c11\u65f6 AUC \u4e0d\u53ef\u9760,\u6807\u6ce8\u9650\u5236\u3002",
+  "class_proportions": {
+    "airplane": {
+      "member_n": 24,
+      "member_pct": 0.12,
+      "nonmember_n": 24,
+      "nonmember_pct": 0.12
+    },
+    "automobile": {
+      "member_n": 24,
+      "member_pct": 0.12,
+      "nonmember_n": 12,
+      "nonmember_pct": 0.06
+    },
+    "bird": {
+      "member_n": 27,
+      "member_pct": 0.135,
+      "nonmember_n": 20,
+      "nonmember_pct": 0.1
+    },
+    "cat": {
+      "member_n": 28,
+      "member_pct": 0.14,
+      "nonmember_n": 28,
+      "nonmember_pct": 0.14
+    },
+    "deer": {
+      "member_n": 21,
+      "member_pct": 0.105,
+      "nonmember_n": 20,
+      "nonmember_pct": 0.1
+    },
+    "dog": {
+      "member_n": 13,
+      "member_pct": 0.065,
+      "nonmember_n": 16,
+      "nonmember_pct": 0.08
+    },
+    "frog": {
+      "member_n": 18,
+      "member_pct": 0.09,
+      "nonmember_n": 18,
+      "nonmember_pct": 0.09
+    },
+    "horse": {
+      "member_n": 19,
+      "member_pct": 0.095,
+      "nonmember_n": 17,
+      "nonmember_pct": 0.085
+    },
+    "ship": {
+      "member_n": 16,
+      "member_pct": 0.08,
+      "nonmember_n": 19,
+      "nonmember_pct": 0.095
+    },
+    "truck": {
+      "member_n": 10,
+      "member_pct": 0.05,
+      "nonmember_n": 26,
+      "nonmember_pct": 0.13
+    }
+  },
+  "class_auc": {
+    "airplane": {
+      "member_n": 24,
+      "nonmember_n": 24,
+      "loss_auc": 0.5711805555555556,
+      "conf_auc": 0.47048611111111116
+    },
+    "automobile": {
+      "member_n": 24,
+      "nonmember_n": 12,
+      "loss_auc": 0.607638888888889,
+      "conf_auc": 0.607638888888889
+    },
+    "bird": {
+      "member_n": 27,
+      "nonmember_n": 20,
+      "loss_auc": 0.8203703703703703,
+      "conf_auc": 0.7759259259259259
+    },
+    "cat": {
+      "member_n": 28,
+      "nonmember_n": 28,
+      "loss_auc": 0.9081632653061225,
+      "conf_auc": 0.8571428571428572
+    },
+    "deer": {
+      "member_n": 21,
+      "nonmember_n": 20,
+      "loss_auc": 0.6952380952380952,
+      "conf_auc": 0.6571428571428571
+    },
+    "dog": {
+      "member_n": 13,
+      "nonmember_n": 16,
+      "loss_auc": 0.7307692307692308,
+      "conf_auc": 0.7067307692307693
+    },
+    "frog": {
+      "member_n": 18,
+      "nonmember_n": 18,
+      "loss_auc": 0.7098765432098766,
+      "conf_auc": 0.691358024691358
+    },
+    "horse": {
+      "member_n": 19,
+      "nonmember_n": 17,
+      "loss_auc": 0.8065015479876161,
+      "conf_auc": 0.8065015479876161
+    },
+    "ship": {
+      "member_n": 16,
+      "nonmember_n": 19,
+      "loss_auc": 0.7269736842105263,
+      "conf_auc": 0.7236842105263158
+    },
+    "truck": {
+      "member_n": 10,
+      "nonmember_n": 26,
+      "loss_auc": 0.65,
+      "conf_auc": 0.6346153846153846
+    }
+  },
+  "overall_loss_based_auc": 0.720025,
+  "overall_conf_based_auc": 0.6878875
+}

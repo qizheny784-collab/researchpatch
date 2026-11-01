@@ -1,0 +1,73 @@
+{
+  "note": "\u6821\u51c6\u8d1f\u5bf9\u7167:\u56fa\u5b9a M_orig \u53c2\u6570,\u53ea\u6539\u53d8\u8f93\u51fa\u6e29\u5ea6 T=0.5/1/2/5,\u540c\u4e00\u6279\u6837\u672c\u6bd4\u8f83\u51c6\u786e\u7387\u4e0e\u4e24\u79cd MIA AUC\u3002\u4e0d\u5220\u9664\u8bad\u7ec3\u4fe1\u606f,\u653b\u51fb\u53d8\u5316\u4e0d\u80fd\u89e3\u91ca\u4e3a\u9057\u5fd8\u6210\u529f\u3002",
+  "model": "M_orig (SmallCNN, CIFAR-10 \u5b50\u96c6 20000 \u5f20, 20 \u8f6e)",
+  "n_eval_member": 200,
+  "n_eval_nonmember": 200,
+  "attack_direction_loss": "\u5206\u6570=-loss(\u6e29\u5ea6\u7f29\u653e\u540e CE loss),\u6210\u5458 loss \u4f4e\u2192\u5206\u6570\u9ad8\u2192AUC \u9ad8",
+  "attack_direction_conf": "\u5206\u6570=softmax \u6700\u5927\u6982\u7387(\u7f6e\u4fe1\u5ea6),\u6210\u5458\u7f6e\u4fe1\u5ea6\u9ad8\u2192\u5206\u6570\u9ad8\u2192AUC \u9ad8",
+  "overall_loss_based_auc": 0.720025,
+  "overall_loss_based_ci95": [
+    0.6678663683728523,
+    0.7670384955929488
+  ],
+  "overall_conf_based_auc": 0.6878875,
+  "overall_conf_based_ci95": [
+    0.6326637162646466,
+    0.7383006991740213
+  ],
+  "temperatures": {
+    "0.5": {
+      "accuracy": 0.8275,
+      "loss_based_auc": 0.7181500000000001,
+      "loss_based_ci95": [
+        0.6669105896476022,
+        0.7647176610269166
+      ],
+      "conf_based_auc": 0.6837,
+      "conf_based_ci95": [
+        0.6303836988215628,
+        0.7330320054531768
+      ]
+    },
+    "1.0": {
+      "accuracy": 0.8275,
+      "loss_based_auc": 0.720025,
+      "loss_based_ci95": [
+        0.6678663683728523,
+        0.7670384955929488
+      ],
+      "conf_based_auc": 0.6878875,
+      "conf_based_ci95": [
+        0.6326637162646466,
+        0.7383006991740213
+      ]
+    },
+    "2.0": {
+      "accuracy": 0.8275,
+      "loss_based_auc": 0.711875,
+      "loss_based_ci95": [
+        0.6583295584449185,
+        0.760639356632473
+      ],
+      "conf_based_auc": 0.679775,
+      "conf_based_ci95": [
+        0.6241895732997229,
+        0.7308333052710941
+      ]
+    },
+    "5.0": {
+      "accuracy": 0.8275,
+      "loss_based_auc": 0.6894,
+      "loss_based_ci95": [
+        0.6354705602636855,
+        0.7411317742949816
+      ],
+      "conf_based_auc": 0.6475000000000001,
+      "conf_based_ci95": [
+        0.5917681930370529,
+        0.7000837085301453
+      ]
+    }
+  },
+  "note_calibration": "\u6e29\u5ea6\u7f29\u653e\u53ea\u6539\u53d8 softmax \u9510\u5ea6,\u4e0d\u6539\u53d8 argmax \u9884\u6d4b\u7c7b\u522b(\u5bf9 T>0 \u5355\u8c03),\u4e0d\u5220\u9664\u4efb\u4f55\u8bad\u7ec3\u4fe1\u606f\u3002\u82e5\u653b\u51fb AUC \u968f\u6e29\u5ea6\u53d8\u5316,\u8bf4\u660e\u653b\u51fb\u5bf9\u6821\u51c6\u654f\u611f,\u4e0d\u80fd\u628a\u653b\u51fb\u53d8\u5316\u5f52\u56e0\u4e8e\u9057\u5fd8\u3002"
+}

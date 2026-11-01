@@ -1,0 +1,69 @@
+{
+  "provenance": "Locally recomputed from recovered per-sample loss scores after a real user correction. Not a new model run or independent audit set.",
+  "n_member": 200,
+  "n_nonmember": 200,
+  "auc": 0.720025,
+  "thresholds": "Illustrative fixed loss thresholds, not optimized on this evaluation set",
+  "rows": [
+    {
+      "member_prior": 0.5,
+      "loss_threshold": 0.01,
+      "attack_accuracy": 0.6900000000000001,
+      "precision": 0.6557377049180328,
+      "recall": 0.8,
+      "fpr": 0.42,
+      "always_nonmember_accuracy": 0.5,
+      "predicted_nonmember_fraction": 0.39
+    },
+    {
+      "member_prior": 0.5,
+      "loss_threshold": 0.1,
+      "attack_accuracy": 0.71,
+      "precision": 0.6390728476821191,
+      "recall": 0.965,
+      "fpr": 0.545,
+      "always_nonmember_accuracy": 0.5,
+      "predicted_nonmember_fraction": 0.245
+    },
+    {
+      "member_prior": 0.5,
+      "loss_threshold": 1.0,
+      "attack_accuracy": 0.6675,
+      "precision": 0.6006006006006006,
+      "recall": 1.0,
+      "fpr": 0.665,
+      "always_nonmember_accuracy": 0.5,
+      "predicted_nonmember_fraction": 0.16749999999999998
+    },
+    {
+      "member_prior": 0.1,
+      "loss_threshold": 0.01,
+      "attack_accuracy": 0.6020000000000001,
+      "precision": 0.17467248908296945,
+      "recall": 0.8,
+      "fpr": 0.42,
+      "always_nonmember_accuracy": 0.9,
+      "predicted_nonmember_fraction": 0.5420000000000001
+    },
+    {
+      "member_prior": 0.1,
+      "loss_threshold": 0.1,
+      "attack_accuracy": 0.506,
+      "precision": 0.1643952299829642,
+      "recall": 0.965,
+      "fpr": 0.545,
+      "always_nonmember_accuracy": 0.9,
+      "predicted_nonmember_fraction": 0.413
+    },
+    {
+      "member_prior": 0.1,
+      "loss_threshold": 1.0,
+      "attack_accuracy": 0.40149999999999997,
+      "precision": 0.14316392269148176,
+      "recall": 1.0,
+      "fpr": 0.665,
+      "always_nonmember_accuracy": 0.9,
+      "predicted_nonmember_fraction": 0.3015
+    }
+  ]
+}
